@@ -11,20 +11,20 @@ Transaction tracking
 It also integrates with external financial APIs using adapter
 
 ## Features
-- User onboarding
-- Account creation
-- Name enquiry (account verification)
-- Balance inquiry
-- Fund transfer between accounts
-- Transaction tracking with reference ID
-- External transfer integration
+ User onboarding
+ Account creation
+ Name enquiry (account verification)
+ Balance inquiry
+ Fund transfer between accounts
+ Transaction tracking with reference ID
+ External transfer integration
 
 ## Tech Stack
-- Node.js
-- Express.js
-- MongoDB + Mongoose
-- Axios (for external API calls)
-- Dotenv
+ Node.js
+ Express.js
+ MongoDB + Mongoose
+ Axios (for external API calls)
+ Dotenv
 
   ## Project Structure
 adapter/
