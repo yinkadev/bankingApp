@@ -4,56 +4,66 @@ const User = require('../models/userModel');
 require("dotenv").config();
 const { getNibssToken }  = require('../token')
 
-
 exports.createUserAccount = async (req, res) => {
   try {
-const { kycID, dob } = req.body;
+    const { kycID, dob } = req.body;
 
-if (!kycID || !dob) {
-  return res.status(400).json({ message: "BVN and DOB are required" });
-}
+    if (!kycID || !dob) {
+      return res.status(400).json({
+        message: "BVN and DOB are required"
+      });
+    }
 
-const bvn = String(kycID).trim();
-const user = await User.findOne({ bvn });
+    const bvn = String(kycID).trim();
+    const user = await User.findOne({ bvn });
 
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found"
+      });
+    }
 
-if (!user) {
-  return res.status(404).json({ message: "User not found" });
-}
+    const existingAccount = await Account.findOne({
+      userId: user._id
+    });
 
-const token = await getNibssToken();
+    if (existingAccount) {
+      return res.status(400).json({
+        message: "User already has an account"
+      });
+    }
 
-const apiResponse = await createAccount({
-  payload: {
-    kycType: "bvn",
-    kycID: bvn,
-    dob
-  },
-  token
-});
+    const token = await getNibssToken();
+    const apiResponse = await createAccount({
+      payload: {
+        kycType: "bvn",
+        kycID: bvn,
+        dob: dob.split("T")[0] 
+      },
+      token
+    });
 
     const accountData = apiResponse.account;
+    if (!accountData || !accountData.accountNumber) {
+      throw new Error("Account number missing from API response");
+    }
 
-if (!accountData || !accountData.accountNumber) {
-  throw new Error("Account number missing from API response");
-}
+    const account = await Account.create({
+      userId: user._id,
 
-const account = await Account.create({
-  userId: user._id,
-  accountNumber: accountData.accountNumber,
-  bankCode: accountData.bankCode,
-  bankName: apiResponse.bankName || "YIN Bank",
-  balance: accountData.balance,
-  transactionId: result.transactionId,
+      accountNumber: accountData.accountNumber,
+      bankCode: accountData.bankCode || "999",
+      bankName: apiResponse.bankName || "YIN Bank",
+      balance: accountData.balance || 0,
+      transactionId:apiResponse.transactionId || accountData.transactionId || null,
+      kycType: "bvn",
+      kycID: bvn,
 
+      dob: dob.split("T")[0],
 
-  kycType: "bvn",
-  kycID: bvn,
-  dob,
-  firstName: user.firstName,
-  lastName: user.lastName
-});
-
+      firstName: user.firstName,
+      lastName: user.lastName
+    });
 
     await User.findByIdAndUpdate(user._id, {
       hasAccount: true,
@@ -67,7 +77,7 @@ const account = await Account.create({
     });
 
   } catch (error) {
-  ( error.message);
+    error(error);
 
     return res.status(500).json({
       message: "Failed to create account",
@@ -75,8 +85,6 @@ const account = await Account.create({
     });
   }
 };
-
-
 exports.getAllAccounts = async (req, res) => {
 
   try {
