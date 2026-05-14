@@ -2,7 +2,6 @@ const express = require('express');
 const connectDB = require('./config/db');
 require("dotenv").config();
 
-
 const onboardRoutes = require('./routes/onboardRoute');
 const accountRoutes = require('./routes/accountRoute');
 const inquiryRoutes = require('./routes/nameIquiryRoute');
@@ -15,20 +14,19 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-
-connectDB()
-  .then(() => {
-
-   app.use('/api', onboardRoutes);
+// Routes
+app.use('/api', onboardRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api', inquiryRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/api/transfer", transferRoutes);
 app.use("/api", transactionRoutes);
 
-
-    app.listen(PORT, () => {8
- 
+// Connect DB then start server
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
