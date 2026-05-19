@@ -1,5 +1,5 @@
 const Account = require("../models/accountModel");
-const Transaction = require("../models/transcation");
+const Transaction = require("../models/transcationModel");
 const { transferFunds } = require("../adapter/transferAdapter");
 
 

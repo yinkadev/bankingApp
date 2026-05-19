@@ -22,12 +22,13 @@ app.use("/api/balance", balanceRoutes);
 app.use("/api/transfer", transferRoutes);
 app.use("/api", transactionRoutes);
 
-// Connect DB then start server
 connectDB()
   .then(() => {
-  app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    console.log("DB connected ✅");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
   })
   .catch((err) => {
     console.error('Database connection failed:', err);
