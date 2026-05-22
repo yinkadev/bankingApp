@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { getNibssToken } = require("../token");
+const { getNibssToken } = require("../service/token");
 
 const transferFunds = async (payload) => {
   try {

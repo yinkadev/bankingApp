@@ -1,0 +1,443 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Banking API",
+    "version": "1.0.0",
+    "description": "Banking API for BVN verification, onboarding, and account services.\n\nAuthentication:\nUse Bearer Token\nAuthorization: Bearer <token>"
+  },
+  "servers": [
+    {
+      "url": "https://nibssbyphoenix.onrender.com"
+    }
+  ],
+  "tags": [
+    { "name": "Auth" },
+    { "name": "BVN" },
+    { "name": "User" },
+    { "name": "Account" },
+    { "name": "Transaction" }
+  ],
+  "paths": {
+    "/api/auth/token": {
+      "post": {
+        "summary": "Generate API token",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "apikey": "your-api-key",
+                "apisecret": "your-secret"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Token generated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "token": "JWT_TOKEN",
+                  "fintech": {
+                    "name": "yink tech",
+                    "email": "test@email.com",
+                    "bankCode": "139",
+                    "bankName": "YIN Bank"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid API credentials"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+"/api/insertBvn": {
+  "post": {
+    "summary": "Create BVN record",
+    "tags": ["BVN"],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "example": {
+            "firstName": "femi",
+            "lastName": "taiwo",
+             "dob": "1990-03-12",
+            "bvn": "08995089001",
+            "phone": "070923139675"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "BVN record created successfully",
+        "content": {
+          "application/json": {
+            "example": {
+              "success": true,
+              "message": "BVN record created successfully",
+              "data": {
+                "bvn": "08995089001",
+                "firstName": "femi",
+                "lastName": "taiwo",
+                "phone": "070923139675"
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Invalid input",
+        "content": {
+          "application/json": {
+            "example": {
+              "message": "BVN is required"
+            }
+          }
+        }
+      }
+    }
+  }
+},
+
+"/api/validateBvn": {
+  "post": {
+    "summary": "Validate BVN",
+    "tags": ["BVN"],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "example": {
+            "bvn": "08995089001"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "BVN validation successful",
+        "content": {
+          "application/json": {
+            "example": {
+              "success": true,
+              "message": "BVN validation successful",
+              "data": {
+                "bvn": "08995089001",
+                "firstName": "femi",
+                "lastName": "taiwo"
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "BVN not found",
+        "content": {
+          "application/json": {
+            "example": {
+              "message": "BVN not found"
+            }
+          }
+        }
+      }
+    }
+  }
+},
+
+
+    "/api/onboard": {
+      "post": {
+        "summary": "Onboard user",
+        "tags": ["User"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "firstName": "femi",
+                "lastName": "taiwo",
+                 "phone": "070923139675",
+                "email": "femi@test.com",
+                "bvn": "08995089001",
+                "dob": "1990-03-12"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User onboarded successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User onboarded successfully",
+                  "user": {
+                    "firstName": "femi",
+                    "lastName": "taiwo",
+                    "email": "femi@test.com",
+                    "bvn": "08995089001",
+                    "isVerified": true,
+                    "hasAccount": false,
+                    "_id": "USER_ID"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "BVN and email are required"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/account/create": {
+      "post": {
+        "summary": "Create account",
+        "tags": ["Account"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "kycType": "bvn",
+                "kycID": "08995089001",
+                "dob": "1990-03-12"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Account created successfully",
+                  "account": {
+                    "accountNumber": "1393111817",
+                    "balance": 15000,
+                    "kycType": "bvn",
+                    "kycID": "08995089001",
+                    "firstName": "femi",
+                    "lastName": "taiwo",
+                    "userId": "USER_ID"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid or missing token"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/account/all": {
+      "get": {
+        "summary": "Get all accounts",
+        "tags": ["Account"],
+        "responses": {
+          "200": {
+            "description": "Accounts fetched successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Accounts fetched successfully",
+                  "count": 2,
+                  "accounts": [
+                    {
+                      "accountNumber": "1393111817",
+                      "balance": 10400,
+                      "firstName": "femi",
+                      "lastName": "taiwo"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/name-enquiry/{accountNumber}": {
+      "get": {
+        "summary": "Account name enquiry",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "accountNumber",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "accountNumber": "1393111817",
+                  "accountName": "femi taiwo",
+                  "bankName": "YIN Bank"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/balance/{accountNumber}": {
+      "get": {
+        "summary": "Check account balance",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "accountNumber",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Balance fetched",
+            "content": {
+              "application/json": {
+                "example": {
+                  "accountNumber": "1393111817",
+                  "balance": 15000
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/transfer": {
+      "post": {
+        "summary": "Transfer funds",
+        "tags": ["Transaction"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "from": "1393111817",
+                "to": "1397222686",
+                "amount": 4600
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transfer successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Transfer successful",
+                  "transaction": {
+                    "from": "1393111817",
+                    "to": "1397222686",
+                    "amount": 4600,
+                    "transactionId": "TX123456",
+                    "status": "success"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/transaction/{reference}": {
+      "get": {
+        "summary": "Get transaction status",
+        "tags": ["Transaction"],
+        "parameters": [
+          {
+            "name": "reference",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction fetched",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Transaction status fetched successfully",
+                  "data": {
+                    "reference": "TX123456",
+                    "amount": 4600,
+                    "status": "SUCCESS"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

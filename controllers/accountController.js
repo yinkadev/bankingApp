@@ -2,15 +2,21 @@ const { createAccount } = require('../adapter/accountAdapter');
 const Account = require('../models/accountModel');
 const User = require('../models/userModel');
 require("dotenv").config();
-const { getNibssToken }  = require('../token')
+const { getNibssToken }  = require('../service/token')
 
 exports.createUserAccount = async (req, res) => {
   try {
-    const { kycID, dob } = req.body;
+    const {kycType, kycID, dob } = req.body;
+ if (!req.body || Object.keys(req.body).length === 0) {
+  return res.status(400).json({
+    message: "Request body is required"
+  });
+}
 
-    if (!kycID || !dob) {
+
+    if (!kycID || !dob || !kycType) {
       return res.status(400).json({
-        message: "BVN and DOB are required"
+        message: "BVN, kycType and DOB are required"
       });
     }
 
